@@ -12,10 +12,8 @@ function DonorForm() {
     e.preventDefault();
     setLoading(true);
     
-    const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
-
     try {
-      const response = await fetch(`${apiUrl}/donors`, {
+      const response = await fetch(`/api/donors`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, bloodGroup, contact, age: Number(age), city }),

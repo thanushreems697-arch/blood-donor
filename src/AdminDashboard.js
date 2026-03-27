@@ -6,9 +6,8 @@ function AdminDashboard() {
   const [deleteLoading, setDeleteLoading] = useState(null);
 
   const fetchDonors = async () => {
-    const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
     try {
-      const response = await fetch(`${apiUrl}/donors`);
+      const response = await fetch(`/api/donors`);
       if (response.ok) {
         const data = await response.json();
         setDonors(data.reverse());
@@ -32,9 +31,8 @@ function AdminDashboard() {
     }
 
     setDeleteLoading(id);
-    const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
     try {
-      const response = await fetch(`${apiUrl}/donors/${id}`, {
+      const response = await fetch(`/api/donors/${id}`, {
         method: "DELETE",
       });
 

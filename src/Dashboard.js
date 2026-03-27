@@ -7,9 +7,8 @@ function Dashboard() {
   // Hardcode some mockup data purely for aesthetics preview if API fails locally
   useEffect(() => {
     const fetchDonors = async () => {
-      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
       try {
-        const response = await fetch(`${apiUrl}/donors`);
+        const response = await fetch(`/api/donors`);
         if (response.ok) {
           const data = await response.json();
           setDonors(data.reverse()); // Show newest first
