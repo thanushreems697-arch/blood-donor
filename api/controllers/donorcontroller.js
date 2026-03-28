@@ -1,4 +1,4 @@
-const pool = require("../db");
+const { pool } = require("../db");
 
 const getDonors = async (req, res) => {
   try {
@@ -7,7 +7,11 @@ const getDonors = async (req, res) => {
     const donors = rows.map(r => ({ ...r, _id: r.id.toString() }));
     res.status(200).json(donors);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching donors", error: error.message });
+    res.status(500).json({ 
+      message: "Error fetching donors from TiDB", 
+      error: error.message,
+      suggestion: "Confirm your TiDB Cloud IP Access List is set to 0.0.0.0/0"
+    });
   }
 };
 
@@ -20,7 +24,11 @@ const addDonor = async (req, res) => {
     );
     res.status(201).json({ id: result.insertId, _id: result.insertId.toString(), ...req.body });
   } catch (error) {
-    res.status(400).json({ message: "Error adding donor", error: error.message });
+    res.status(400).json({ 
+      message: "Error adding donor to TiDB", 
+      error: error.message,
+      details: "Check if the table was created successfully and credentials are correct."
+    });
   }
 };
 

@@ -18,10 +18,15 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+let isInitialized = false;
+
 // Auto-initialize the table if it's not present
 const initDB = async () => {
+  if (isInitialized) return;
+  
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     console.log("TiDB Connected Successfully");
 
     await connection.query(`
@@ -36,14 +41,14 @@ const initDB = async () => {
       )
     `);
     
-    connection.release();
+    isInitialized = true;
     console.log("Database table synchronized");
   } catch (error) {
     console.error("TiDB Connection/Init Error:", error.message);
+    throw error; // Rethrow so the middleware knows something is wrong
+  } finally {
+    if (connection) connection.release();
   }
 };
 
-// Start initialization immediately
-initDB();
-
-module.exports = pool;
+module.exports = { pool, initDB };
