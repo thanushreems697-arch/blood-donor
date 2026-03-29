@@ -1,7 +1,8 @@
-const { pool } = require("../db");
+const { getPool } = require("../db");
 
 const getDonors = async (req, res) => {
   try {
+    const pool = getPool();
     const [rows] = await pool.query("SELECT * FROM donors ORDER BY id DESC");
     // Map 'id' to '_id' for frontend compatibility
     const donors = rows.map(r => ({ ...r, _id: r.id.toString() }));
@@ -18,6 +19,7 @@ const getDonors = async (req, res) => {
 const addDonor = async (req, res) => {
   const { name, bloodGroup, contact, age, city } = req.body;
   try {
+    const pool = getPool();
     const [result] = await pool.query(
       "INSERT INTO donors (name, bloodGroup, contact, age, city) VALUES (?, ?, ?, ?, ?)",
       [name, bloodGroup, contact, age, city]
@@ -34,6 +36,7 @@ const addDonor = async (req, res) => {
 
 const deleteDonor = async (req, res) => {
   try {
+    const pool = getPool();
     const [result] = await pool.query("DELETE FROM donors WHERE id = ?", [req.params.id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Donor not found" });
