@@ -1,44 +1,36 @@
-const { getPool } = require("../db");
+const Donor = require("../models/Donor");
 
 const getDonors = async (req, res) => {
   try {
-    const pool = getPool();
-    const [rows] = await pool.query("SELECT * FROM donors ORDER BY id DESC");
-    // Map 'id' to '_id' for frontend compatibility
-    const donors = rows.map(r => ({ ...r, _id: r.id.toString() }));
+    const donors = await Donor.find().sort({ createdAt: -1 });
     res.status(200).json(donors);
   } catch (error) {
     res.status(500).json({ 
-      message: "Error fetching donors from TiDB", 
+      message: "Error fetching donors from MongoDB", 
       error: error.message,
-      suggestion: "Confirm your TiDB Cloud IP Access List is set to 0.0.0.0/0"
+      suggestion: "Make sure you have added MONGO_URI to your Vercel Environment Variables."
     });
   }
 };
 
 const addDonor = async (req, res) => {
-  const { name, bloodGroup, contact, age, city } = req.body;
   try {
-    const pool = getPool();
-    const [result] = await pool.query(
-      "INSERT INTO donors (name, bloodGroup, contact, age, city) VALUES (?, ?, ?, ?, ?)",
-      [name, bloodGroup, contact, age, city]
-    );
-    res.status(201).json({ id: result.insertId, _id: result.insertId.toString(), ...req.body });
+    const newDonor = new Donor(req.body);
+    await newDonor.save();
+    res.status(201).json(newDonor);
   } catch (error) {
     res.status(400).json({ 
-      message: "Error adding donor to TiDB", 
+      message: "Error adding donor to MongoDB", 
       error: error.message,
-      details: "Check if the table was created successfully and credentials are correct."
+      details: "Check your database connection and JSON format."
     });
   }
 };
 
 const deleteDonor = async (req, res) => {
   try {
-    const pool = getPool();
-    const [result] = await pool.query("DELETE FROM donors WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) {
+    const deletedDonor = await Donor.findByIdAndDelete(req.params.id);
+    if (!deletedDonor) {
       return res.status(404).json({ message: "Donor not found" });
     }
     res.status(200).json({ message: "Donor deleted successfully" });
