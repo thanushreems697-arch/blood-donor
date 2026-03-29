@@ -27,6 +27,16 @@ app.use(async (req, res, next) => {
 
 app.use("/api/donors", donorRoutes);
 
+// Health check route for diagnostics
+app.get("/api/health", async (req, res) => {
+  try {
+    await initDB();
+    res.json({ status: "ok", message: "TiDB Connected and Ready" });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: err.message, hint: "Check TiDB Password or IP Access List (Whitelist)" });
+  }
+});
+
 // Export the app for Vercel Serverless Functions
 module.exports = app;
 

@@ -23,7 +23,8 @@ function DonorForm() {
         alert("Donor added successfully! Thank you for your kindness.");
         setName(""); setBloodGroup(""); setContact(""); setAge(""); setCity("");
       } else {
-        alert("Failed to add donor.");
+        const errData = await response.json();
+        alert(`Failed to add donor: ${errData.message || "Unknown error"}. Check the console for more details.`);
       }
     } catch (error) {
       console.error(error);
